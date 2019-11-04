@@ -1,12 +1,5 @@
-import requests
-import csv
-import xarray
-import os
-import pandas
-import numpy as np
 from sklearn.preprocessing import StandardScaler
-from scipy.cluster import hierarchy
-from helper_functions import *
+from helper_functions import import_data, fix_units, normalise_sun
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from mpl_toolkits.mplot3d import Axes3D
@@ -24,7 +17,7 @@ if __name__ == "__main__":
     df['Sunshine'] = df['Sunshine'].clip(0.0, 1.0)
     df['MaxWindSpeed'] = df['MaxWindSpeed'].clip(0.0, 75.0)
 
-    df.dropna(inplace = True)
+    df.dropna(inplace=True)
 
     # Scale columns using normal transform
     scaler = StandardScaler()
