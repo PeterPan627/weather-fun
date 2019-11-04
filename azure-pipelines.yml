@@ -3,9 +3,6 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-- master
-
 pool:
   vmImage: 'ubuntu-latest'
 
@@ -14,6 +11,6 @@ steps:
   displayName: 'Run a one-line script'
 
 - script: |
-    pip3 install flake8  
-    python3 -m flake8 *.py
+    pip3 install flake8
+    python3 -m flake8 main.py
   displayName: 'Run a multi-line script'
