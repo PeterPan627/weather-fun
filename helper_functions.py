@@ -1,7 +1,7 @@
 import urllib
 from suntime import Sun
 import pandas
-import numpy as np 
+import numpy as np
 import os
 
 def save_csv_from_url(url, saving_path):
@@ -26,7 +26,7 @@ def fix_units(df):
 	df['DewPoint'] = df['DewPoint'].apply(lambda x: x/10)
 	df['MeanWindSpeed'] = df['MeanWindSpeed'].apply(lambda x: x/10)
 	df['Sunshine'] = df['Sunshine'].apply(lambda x: x/100)
-	df['Rainfall'] = df['Rainfall'].apply(lambda x: x/100)
+	df['Rainfall'] = df['Rainfall'].apply(lambda x: x/1000)
 	df['MaxWindSpeed'] = df['MaxWindSpeed'].apply(lambda x: x/10)
 
 def normalise_sun(df):
@@ -50,14 +50,14 @@ def import_data():
 	df['Timestamp'] = pandas.to_datetime(df['Timestamp'])
 	df['Temperature'] = pandas.to_numeric(df['Temperature'])
 	df = df.set_index('Timestamp')
-	df = df.resample('D').agg({'Temperature': np.mean, 
+	df = df.resample('D').agg({'Temperature': np.mean,
                                 'Humidity': np.mean,
                                 'DewPoint': np.mean,
                                 'Pressure': np.mean,
                                 'MeanWindSpeed': np.mean,
                                 'WindBearing': np.mean,
                                 'Sunshine': np.sum,
-                                'Rainfall': np.mean,
+                                'Rainfall': np.sum,
                                 'MaxWindSpeed': np.max
                                 })
 	return df
