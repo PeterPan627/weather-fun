@@ -21,6 +21,14 @@ df['Timestamp'] = pandas.to_datetime(df['Timestamp'])
 df['Temperature'] = pandas.to_numeric(df['Temperature'])
 df = df.set_index('Timestamp')
 
+#functions to normalize the sun and wind
+from normalise_functions import normalize_sun
+from normalise_functions import normalize_wind
+
+
+df = normalize_sun(df)
+df = normalize_wind(df)
+
 df = df.resample('D')
 
 print(df)
