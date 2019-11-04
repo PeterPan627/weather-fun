@@ -1,34 +1,44 @@
 import requests
 import csv
-import pandas
-import matplotlib.pyplot as plt
+import xarray
 import os
+import pandas
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+from scipy.cluster import hierarchy
+from helper_functions import *
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from mpl_toolkits.mplot3d import Axes3D
 
-from helper_functions import save_csv_from_url
+if __name__ == "__main__":
 
-url = "https://www.cl.cam.ac.uk/research/dtg/weather/weather-raw.csv"
-data_file = "data.csv"
+    # Import dataframe
+    df = import_data()
 
-# Only download CSV if not present locally
-if not os.path.exists(data_file):
-	save_csv_from_url(url, data_file)
+    # Fix the units
+    fix_units(df)
 
-headers = ["Timestamp","Temperature","Humidity","DewPoint","Pressure",
-		   "MeanWindSpeed","WindBearing","Sunshine","Rainfall","MaxWindSpeed"]
+    # Transform the sunlight column
+    normalise_sun(df)
+    df['Sunshine'] = df['Sunshine'].clip(0.0, 1.0)
+    df['MaxWindSpeed'] = df['MaxWindSpeed'].clip(0.0, 75.0)
 
-df = pandas.read_csv(data_file, names=headers)
-df['Timestamp'] = pandas.to_datetime(df['Timestamp'])
-df['Temperature'] = pandas.to_numeric(df['Temperature'])
-df = df.set_index('Timestamp')
+    df.dropna(inplace = True)
 
-#functions to normalize the sun and wind
-from normalise_functions import normalize_sun
-from normalise_functions import normalize_wind
+    # Scale columns using normal transform
+    scaler = StandardScaler()
+    dfscaled = df.copy()
+    dfscaled[df.columns] = scaler.fit_transform(df[df.columns])
 
+    # cluster and plot
+    keys = ['Rainfall', 'Sunshine', 'MaxWindSpeed']
 
-df = normalize_sun(df)
-df = normalize_wind(df)
-
-df = df.resample('D')
-
-print(df)
+    kmeans = KMeans(n_clusters=5, random_state=0).fit(dfscaled[keys])
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    ax.scatter(*(df[i] for i in keys), c=kmeans.labels_)
+    ax.set_xlabel(keys[0])
+    ax.set_ylabel(keys[1])
+    ax.set_zlabel(keys[2])
+    plt.show()
